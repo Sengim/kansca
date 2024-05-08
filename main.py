@@ -33,7 +33,7 @@ path = "/mnt/d/Datasets"
 dataset = load_dataset(dataset_id, path, target_byte, traces_dim, leakage_model=lm)
 dataset.rescale(False)
 
-model = KAN(width=[traces_dim, 5, CLASSES], grid=3, k=3, device='cuda:0', seed=0, symbolic_enabled=False)
+model = KAN(width=[traces_dim, 5,2, CLASSES], grid=3, k=3, device='cuda:0', seed=0, symbolic_enabled=False)
 model.double()
 # model.to('cuda:0')
 new_dataset = create_torch_dataset(dataset, device=model.device)
@@ -50,7 +50,7 @@ print(y_pred)
 y_pred = np.clip(y_pred, 0, None)
 sums = np.sum(y_pred, axis=1).reshape(-1,1)
 y_pred = y_pred/sums
-ge, ge_v, nt= guessing_entropy(y_pred, dataset.labels_key_hypothesis_attack, dataset.correct_key_attack, 2000)
+ge, ge_v, nt= guessing_entropy(y_pred, dataset.labels_key_hypothesis_attack, dataset.correct_key_attack, 5000)
 plt.plot(ge_v)
 plt.show()
 
