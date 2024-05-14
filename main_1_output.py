@@ -20,8 +20,8 @@ def create_torch_dataset(dataset, device="cuda:0"):
     print(tmp['train_input'].dtype)
     tmp["test_input"] = torch.from_numpy(dataset.x_attack).to(device).double()
 
-    tmp['train_label'] = torch.from_numpy(to_categorical(np.array(dataset.profiling_labels))).to(device)
-    tmp['test_label'] = torch.from_numpy(to_categorical(np.array(dataset.attack_labels))).to(device)
+    tmp['train_label'] = torch.from_numpy(np.array(dataset.profiling_labels).reshape(-1,1)).to(device)
+    tmp['test_label'] = torch.from_numpy(np.array(dataset.attack_labels).reshape(-1,1)).to(device)
     return tmp
 
 def to_categorical(y, num_classes=CLASSES):
@@ -34,16 +34,17 @@ path = "/mnt/d/Datasets"
 #dataset = load_dataset(dataset_id, path, target_byte, traces_dim, leakage_model=lm)
 dataset = SimulateHigherOrder(1, n_prof, 10000, 1, traces_dim, leakage_model=lm)
 
-model = KAN(width=[traces_dim, 2, CLASSES], grid=3, k=3, device='cuda:0', seed=0, symbolic_enabled=True)
+model = KAN(width=[traces_dim, 2, 1], grid=3, k=3, device='cuda:0', seed=0, symbolic_enabled=True)
 model.double()
 # model.to('cuda:0')
 new_dataset = create_torch_dataset(dataset, device=model.device)
 print(new_dataset['train_label'].shape)
 #model.plot()
-model.train(new_dataset,opt="Adam", steps=20000, device=model.device,lamb=0.01, lamb_l1=0.2,lamb_entropy=0.2,  lr=1e-3,batch=200, loss_fn=torch.nn.CrossEntropyLoss())
+model.train(new_dataset,opt="Adam", steps=20000, device=model.device,lamb=0.01, lamb_l1=0.2,lamb_entropy=0.2,  lr=1e-3,batch=200, loss_fn=None)
 model.prune()
 #To SHow the plot you need ot add plt.show() at end of plot function
 model.plot(title="fa")
+
 #model.train(new_dataset,opt="Adam", steps=8000, device=model.device,lamb=0.001, lamb_l1=0.2,lamb_entropy=0.2,  lr=1e-3,batch=200, loss_fn=torch.nn.CrossEntropyLoss())
 # y_pred= model(torch.from_numpy(dataset.x_attack[:2000]).to('cuda:0')).cpu().detach().numpy()
 # for i in range(1, 5):

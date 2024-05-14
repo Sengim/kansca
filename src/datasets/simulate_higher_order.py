@@ -1,6 +1,5 @@
 import numpy as np
 import random
-from numba import njit
 
 """
 Two Tables to process a field multiplication over GF(256): a*b = alog (log(a) + log(b) mod 255)
@@ -39,7 +38,6 @@ alog_table = np.array([1, 3, 5, 15, 17, 51, 85, 255, 26, 46, 114, 150, 161, 248,
                        18, 54, 90, 238, 41, 123, 141, 140, 143, 138, 133, 148, 167, 242, 13, 23,
                        57, 75, 221, 124, 132, 151, 162, 253, 28, 36, 108, 180, 199, 82, 246, 1])
 
-@njit
 def multGF256(a, b):
     """ Multiplication function in GF(2^8) """
     if (a == 0) or (b == 0):
@@ -59,33 +57,22 @@ vec_hw = np.vectorize(hw)
 
 class SimulateHigherOrder():
 
-    def __init__(self, args, order, num_traces, num_attack_traces,  num_informative_features, num_features) -> None:
+    def __init__(self, order, num_traces, num_attack_traces, num_informative_features, num_features, leakage_model="ID", indices=[2, 4, 6,8]) -> None:
 
-        add_noise = args["sim_noise"]
-        leakage_model = args["leakage_model"]
-        
         self.order = order
-        self.uni_noise=args["sim_vary_noise"]
-        print(args["sim_vary_noise"], self.uni_noise)
-        self.pick_leakage_spread(args["sim_leakage"])
-        if args["sim_leakage"] =="real":
-            self.bits = []
-        print(f"sim_noise={add_noise}")
+        self.affine, self.rsm_mask= False, False
         self.num_traces = num_traces
         self.n_profiling = num_traces
         self.n_attack = num_attack_traces
         self.num_features = num_features
         self.num_informative_features = num_informative_features
         self.num_leakage_regions = 2
-        self.rsm_mask = args["dataset_target"] == "dpa_v42"
-        self.affine = args["dataset_target"] == "ascadv2"
-        self.noise = add_noise
-        if num_features//(order+1)==num_informative_features or self.affine:
+        self.noise=0.5
+        if num_features//(order+1)==num_informative_features:
             self.x_profiling, self.profiling_masks, self.profiling_shares  = self.only_informative(num_traces)
             self.x_attack, self.attack_masks, self.attack_shares  = self.only_informative(num_attack_traces)
         else:
-            self.create_pattern(num_informative_features//self.num_leakage_regions, 20)
-            indices = 20 * np.random.randint(num_features//20, size=self.num_leakage_regions * (self.order+1))
+            
             self.x_profiling, self.profiling_masks, self.profiling_shares  = self.generate_traces(num_traces, indices)
             self.x_attack, self.attack_masks, self.attack_shares  = self.generate_traces(num_attack_traces, indices)
 
@@ -96,9 +83,9 @@ class SimulateHigherOrder():
     def generate_traces(self, num_traces, leakage_region_indices):
 
         masks = np.random.randint(16, size=(num_traces, self.order + 1), dtype =np.uint8)
-        if self.rsm_mask:
-            rsm_masks = np.random.choice([3, 12, 53, 58, 80, 95, 102, 105, 150, 153, 160, 175, 197, 202, 243, 252], size=num_traces)
-            masks[:, 0] = rsm_masks
+        # if self.rsm_mask:
+        #     rsm_masks = np.random.choice([3, 12, 53, 58, 80, 95, 102, 105, 150, 153, 160, 175, 197, 202, 243, 252], size=num_traces)
+        #     masks[:, 0] = rsm_masks
         shares = np.zeros((num_traces, self.order + 1), dtype=np.uint8)
 
         for i in range(self.order):
@@ -111,14 +98,10 @@ class SimulateHigherOrder():
         leakage_values = self.leakages_spread(shares, self.num_features, num_traces)
         #leakage_values = vec_hw(shares)
         
-        traces = np.random.normal(0, 2.5, size=(num_traces, self.num_features))
-        # How to include the actual leakage values is maybe a problem.
-        # Perhaps try to put leakages of specific value in clusters, because current implementation seems unrealistic and problematic.
+        traces = np.random.normal(0, self.noise, size=(num_traces, self.num_features))
         
         for i in range(self.order + 1):
-            for j in range(self.num_leakage_regions):
-                
-                traces = self.include_leakage_around_index(traces, leakage_region_indices[i *self.num_leakage_regions + j], i, leakage_values)
+            traces[:, leakage_region_indices[i]] += leakage_values[i, 0]
         return traces, masks, shares 
     
     def leakages_spread(self, shares, num_points, num_traces):
@@ -139,6 +122,18 @@ class SimulateHigherOrder():
                     leakage = leakage + ((value >> j) & 1)
                 if len(bits) == 1:
                     leakage = leakage* 3
+                leakage_spread[share, i, :] = leakage
+        return leakage_spread
+    
+    def leakages_spread_ID(self, shares, num_points, num_traces):
+        print("-------------------------------s")
+        leakage_spread = np.zeros((self.order +1, num_points, num_traces))
+        for share in range(self.order+1):
+            for i in range(num_points):
+                #bits = [(i//4)%8]
+                #print(bits)
+                #bits=[4, 5, 6, 7]
+                leakage = shares[:, share].copy()
                 leakage_spread[share, i, :] = leakage
         return leakage_spread
                 
