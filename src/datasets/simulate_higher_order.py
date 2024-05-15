@@ -57,7 +57,7 @@ vec_hw = np.vectorize(hw)
 
 class SimulateHigherOrder():
     """
-    Class to simulate n'th order masking. Note that currently it only really contains code for boolean masking.
+    Class to simulate n'th order masking. Note that currently it only really contains code for boolean masking).
 
     Adding arithmetic and other schemes should be relatively straightforward. 
     """
@@ -112,6 +112,18 @@ class SimulateHigherOrder():
             for j in range(self.num_informative_features):
                 traces[:, leakage_region_indices[i][j]] += leakage_values[i,j , :]
         return traces, masks, shares 
+    
+    def pick_leakage_spread(self, lm):
+        lm = lm.lower()
+        if lm == "real":
+            self.leakage_func = self.leakages_spread_real
+        elif lm == "hw":
+            self.leakage_func = self.leakage_spread_hw
+        elif lm == "bit":
+            self.leakage_func = self.leakage_spread_bit
+        else:
+            self.leakage_func = self.leakages_spread_ID
+
     
     
     def leakages_spread_ID(self, shares, num_points, num_traces):

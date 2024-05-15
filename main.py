@@ -7,7 +7,7 @@ from src.datasets.simulate_higher_order import *
 
 dataset_id = 'ASCAD'
 resample_window=80
-traces_dim = 15
+traces_dim = 5
 n_prof= 50000
 lm = "HW"
 CLASSES=9 if lm == "HW" else 256
