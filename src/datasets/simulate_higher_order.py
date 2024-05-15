@@ -103,7 +103,7 @@ class SimulateHigherOrder():
         #Function for picking leakage model, this supports spreading out leakage over several leaky points (num_features param)
         #pick leakage_spread does this automatically
         #leakage()
-        leakage_values = self.leakage_func(shares, self.num_features, num_traces)
+        leakage_values = self.leakage_func(shares, self.num_informative_features, num_traces)
         #leakage_values = vec_hw(shares)
         
         traces = np.random.normal(0, self.noise, size=(num_traces, self.num_features))
@@ -148,8 +148,10 @@ class SimulateHigherOrder():
         for share in range(self.order+1):
             value = shares[:, share].copy()
             for i in range(num_points):
+
                 num_bits = np.random.randint(3, 8)
                 bits = np.random.choice(sample_source, num_bits, replace=False)
+                print(share, i, bits)
                 #bits = [(i//4)%8]
                 #print(bits)
                 #bits=[4, 5, 6, 7]
