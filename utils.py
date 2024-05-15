@@ -9,6 +9,7 @@ from src.datasets.load_ascadf import *
 # from src.datasets.load_dpav42 import *
 from src.datasets.load_eshard import *
 # from src.datasets.load_chesctf import *
+from src.datasets.simulate_higher_order import *
 from os.path import exists
 
 

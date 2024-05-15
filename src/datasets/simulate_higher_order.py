@@ -144,7 +144,7 @@ class SimulateHigherOrder():
         """leaks between 3-8 random bits of a share for each point"""
         print("------------real---s")
         leakage_spread = np.zeros((self.order +1, num_points, num_traces))
-        sample_source = np.arange(0, 9)
+        sample_source = np.arange(0, 8)
         for share in range(self.order+1):
             value = shares[:, share].copy()
             for i in range(num_points):
