@@ -86,7 +86,7 @@ class SimulateHigherOrder():
 
     def generate_traces(self, num_traces, leakage_region_indices):
 
-        masks = np.random.randint(16, size=(num_traces, self.order + 1), dtype =np.uint8)
+        masks = np.random.randint(256, size=(num_traces, self.order + 1), dtype =np.uint8)
         # if self.rsm_mask:
         #     rsm_masks = np.random.choice([3, 12, 53, 58, 80, 95, 102, 105, 150, 153, 160, 175, 197, 202, 243, 252], size=num_traces)
         #     masks[:, 0] = rsm_masks
@@ -110,6 +110,7 @@ class SimulateHigherOrder():
         
         for i in range(self.order + 1):
             for j in range(self.num_informative_features):
+                print(leakage_region_indices[i][j])
                 traces[:, leakage_region_indices[i][j]] += leakage_values[i,j , :]
         return traces, masks, shares 
     
@@ -184,7 +185,7 @@ class SimulateHigherOrder():
         for share in range(self.order+1):
             value = shares[:, share].copy()
             for i in range(num_points):
-                bits = [i//(num_points//8) % 8]
+                bits = [i % 8]
                 print(bits)
                 leakage = np.zeros_like(value)
                 for j in bits:

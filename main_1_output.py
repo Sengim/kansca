@@ -7,7 +7,7 @@ from src.datasets.simulate_higher_order import *
 
 dataset_id = 'ASCAD'
 resample_window=80
-traces_dim = 15
+traces_dim = 32
 n_prof= 50000
 lm = "HW"
 CLASSES=9 if lm == "HW" else 256
@@ -32,18 +32,22 @@ target_byte = 2
 path = "/mnt/d/Datasets"
 
 #dataset = load_dataset(dataset_id, path, target_byte, traces_dim, leakage_model=lm)
-dataset = SimulateHigherOrder(1, n_prof, 10000, 1, traces_dim, leakage_model=lm, indices=[[1], [3]], noise=0.5, leakage_sim="ID")
+dataset = SimulateHigherOrder(1, n_prof, 10000, 16, traces_dim, leakage_model=lm, indices=[[i for i  in range(16)], [i+16 for i in range(16)]], noise=0.8, leakage_sim="bit")
 
-model = KAN(width=[traces_dim, 2, 1], grid=3, k=3, device='cuda:0', seed=0, symbolic_enabled=True)
+model = KAN(width=[traces_dim, 16, 8,  1], grid=3, k=3, device='cuda:0', seed=0, symbolic_enabled=False)
 model.double()
 # model.to('cuda:0')
 new_dataset = create_torch_dataset(dataset, device=model.device)
 print(new_dataset['train_label'].shape)
 #model.plot()
-model.train(new_dataset,opt="Adam", steps=20000, device=model.device,lamb=0.01, lamb_l1=0.2,lamb_entropy=0.2,  lr=1e-3,batch=200, loss_fn=None)
+model.train(new_dataset,opt="Adam", steps=4000, device=model.device,lamb=0,  lr=1e-3,batch=50, loss_fn=None)
+model.train(new_dataset,opt="Adam", steps=2000, device=model.device,lamb=0.1,  lr=1e-3,batch=50, loss_fn=None)
 model.prune()
 #To SHow the plot you need ot add plt.show() at end of plot function
-model.plot(title="fa")
+in_vars = []
+for i in range(32):
+    in_vars.append(f"s_{i//16}_b_{i%8}")
+model.plot(title="fa", in_vars=in_vars)
 
 #model.train(new_dataset,opt="Adam", steps=8000, device=model.device,lamb=0.001, lamb_l1=0.2,lamb_entropy=0.2,  lr=1e-3,batch=200, loss_fn=torch.nn.CrossEntropyLoss())
 # y_pred= model(torch.from_numpy(dataset.x_attack[:2000]).to('cuda:0')).cpu().detach().numpy()
