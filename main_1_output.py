@@ -32,7 +32,7 @@ target_byte = 2
 path = "/mnt/d/Datasets"
 
 #dataset = load_dataset(dataset_id, path, target_byte, traces_dim, leakage_model=lm)
-dataset = SimulateHigherOrder(1, n_prof, 10000, 1, traces_dim, leakage_model=lm)
+dataset = SimulateHigherOrder(1, n_prof, 10000, 1, traces_dim, leakage_model=lm, indices=[[1], [3]], noise=0.5, leakage_sim="ID")
 
 model = KAN(width=[traces_dim, 2, 1], grid=3, k=3, device='cuda:0', seed=0, symbolic_enabled=True)
 model.double()

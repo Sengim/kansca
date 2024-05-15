@@ -40,7 +40,7 @@ model.double()
 new_dataset = create_torch_dataset(dataset, device=model.device)
 print(new_dataset['train_label'].shape)
 #model.plot()
-model.train(new_dataset,opt="Adam", steps=20000, device=model.device,lamb=0.01, lamb_l1=0.2,lamb_entropy=0.2,  lr=1e-3,batch=200, loss_fn=torch.nn.CrossEntropyLoss())
+model.train(new_dataset,opt="Adam", steps=2000, device=model.device,lamb=0.01, lamb_l1=0.2,lamb_entropy=0.2,  lr=1e-3,batch=200, loss_fn=torch.nn.CrossEntropyLoss())
 model.prune()
 #To SHow the plot you need ot add plt.show() at end of plot function
 model.plot(title="fa")

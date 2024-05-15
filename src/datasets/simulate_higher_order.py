@@ -56,9 +56,18 @@ def hw(input: np.uint32):
 vec_hw = np.vectorize(hw)
 
 class SimulateHigherOrder():
+    """
+    Class to simulate n'th order masking. Note that currently it only really contains code for boolean masking.
 
-    def __init__(self, order, num_traces, num_attack_traces, num_informative_features, num_features, leakage_model="ID", indices=[2, 4, 6,8]) -> None:
+    Adding arithmetic and other schemes should be relatively straightforward. 
+    """
 
+    def __init__(self, order, num_traces, num_attack_traces, num_informative_features, num_features, leakage_model="ID", indices=[[2], [4]], noise=0.5, leakage_sim="ID") -> None:
+        """initialize simulations
+        :param order: order of masking, inputting 1 here results in 2 shares 
+        :param leakage_model: for labels
+        :param indices: list(len = shares) of lists(len = num_inf_features) of indices correspodning to the point(s) where each share leaks
+        :param leakage_sim: which leakage function to select, see pick_leakage_spread for options"""
         self.order = order
         self.affine, self.rsm_mask= False, False
         self.num_traces = num_traces
@@ -66,15 +75,10 @@ class SimulateHigherOrder():
         self.n_attack = num_attack_traces
         self.num_features = num_features
         self.num_informative_features = num_informative_features
-        self.num_leakage_regions = 2
-        self.noise=0.5
-        if num_features//(order+1)==num_informative_features:
-            self.x_profiling, self.profiling_masks, self.profiling_shares  = self.only_informative(num_traces)
-            self.x_attack, self.attack_masks, self.attack_shares  = self.only_informative(num_attack_traces)
-        else:
-            
-            self.x_profiling, self.profiling_masks, self.profiling_shares  = self.generate_traces(num_traces, indices)
-            self.x_attack, self.attack_masks, self.attack_shares  = self.generate_traces(num_attack_traces, indices)
+        self.noise=noise
+        self.pick_leakage_spread(leakage_sim)
+        self.x_profiling, self.profiling_masks, self.profiling_shares  = self.generate_traces(num_traces, indices)
+        self.x_attack, self.attack_masks, self.attack_shares  = self.generate_traces(num_attack_traces, indices)
 
         self.profiling_labels = self.profiling_masks[:, order] if leakage_model == "ID" else vec_hw(self.profiling_masks[:, order])
         self.attack_labels = self.attack_masks[:, order] if leakage_model == "ID" else vec_hw(self.attack_masks[:, order])
@@ -87,7 +91,7 @@ class SimulateHigherOrder():
         #     rsm_masks = np.random.choice([3, 12, 53, 58, 80, 95, 102, 105, 150, 153, 160, 175, 197, 202, 243, 252], size=num_traces)
         #     masks[:, 0] = rsm_masks
         shares = np.zeros((num_traces, self.order + 1), dtype=np.uint8)
-
+        #Mask generation
         for i in range(self.order):
             shares[:, i] = masks[:, i]
         temp = masks[:, 0]
@@ -95,35 +99,20 @@ class SimulateHigherOrder():
             temp = temp ^ masks[:, i]
         shares[:, self.order] = temp
 
-        leakage_values = self.leakages_spread(shares, self.num_features, num_traces)
+
+        #Function for picking leakage model, this supports spreading out leakage over several leaky points (num_features param)
+        #pick leakage_spread does this automatically
+        #leakage()
+        leakage_values = self.leakage_func(shares, self.num_features, num_traces)
         #leakage_values = vec_hw(shares)
         
         traces = np.random.normal(0, self.noise, size=(num_traces, self.num_features))
         
         for i in range(self.order + 1):
-            traces[:, leakage_region_indices[i]] += leakage_values[i, 0]
+            for j in range(self.num_informative_features):
+                traces[:, leakage_region_indices[i][j]] += leakage_values[i,j , :]
         return traces, masks, shares 
     
-    def leakages_spread(self, shares, num_points, num_traces):
-        print("-------------------------------s")
-        leakage_spread = np.zeros((self.order +1, num_points, num_traces))
-        for share in range(self.order+1):
-            value = shares[:, share].copy()
-            for i in range(num_points):
-  
-                bits = [i for i in range(4)]
-                if i > 24:
-                    bits = [i for i in range(4, 8)] 
-                #bits = [(i//4)%8]
-                #print(bits)
-                #bits=[4, 5, 6, 7]
-                leakage = np.zeros_like(value)
-                for j in bits:
-                    leakage = leakage + ((value >> j) & 1)
-                if len(bits) == 1:
-                    leakage = leakage* 3
-                leakage_spread[share, i, :] = leakage
-        return leakage_spread
     
     def leakages_spread_ID(self, shares, num_points, num_traces):
         print("-------------------------------s")
@@ -139,6 +128,7 @@ class SimulateHigherOrder():
                 
 
     def leakages_spread_real(self, shares, num_points, num_traces):
+        """leaks between 3-8 random bits of a share for each point"""
         print("------------real---s")
         leakage_spread = np.zeros((self.order +1, num_points, num_traces))
         sample_source = np.arange(0, 9)
@@ -160,6 +150,7 @@ class SimulateHigherOrder():
     
     def leakage_spread_hw(self, shares, num_points, num_traces):
         print("-------------HW-------------s")
+        """Leaks HW of each share"""
         leakage_spread = np.zeros((self.order +1, num_points, num_traces))
         for share in range(self.order+1):
             value = shares[:, share].copy()
@@ -176,6 +167,7 @@ class SimulateHigherOrder():
     
     def leakage_spread_bit(self, shares, num_points, num_traces):
         print("-------------------------------s")
+        """leaks each bit seperatly, to leak all bits need at least 8 points per share"""
         leakage_spread = np.zeros((self.order +1, num_points, num_traces))
         for share in range(self.order+1):
             value = shares[:, share].copy()
@@ -202,8 +194,6 @@ class SimulateHigherOrder():
                 leakage = np.zeros_like(value)
                 for j in bits:
                     leakage = leakage + ((value >> j) & 1)
-                # if len(bits) == 1:
-                #     leakage = leakage* 3
                 leakage_spread[share, i, :] = leakage
         return leakage_spread
     
@@ -217,119 +207,5 @@ class SimulateHigherOrder():
                 leakage = np.zeros_like(value)
                 for j in bits:
                     leakage = leakage + ((value >> j) & 1)
-                # if len(bits) == 1:
-                #     leakage = leakage* 3
                 leakage_spread[share, i, :] = leakage
         return leakage_spread
-
-
-
-    
-    def only_informative(self, num_traces):
-        print("Only informativce")
-        if self.affine:
-            return self.only_informative_affine(num_traces)
-        
-        masks = np.random.randint(256, size=(num_traces, self.order + 1), dtype =np.uint8)
-        if self.rsm_mask:
-            rsm_masks = np.random.choice([3, 12, 53, 58, 80, 95, 102, 105, 150, 153, 160, 175, 197, 202, 243, 252], size=num_traces)
-            masks[:, 0] = rsm_masks
-        shares = np.zeros((num_traces, self.order + 1), dtype=np.uint8)
-
-        for i in range(self.order):
-            shares[:, i] = masks[:, i]
-        temp = masks[:, 0].copy()
-        for i in range(1, self.order+1):
-            temp = temp ^ masks[:, i]
-        shares[:, self.order] = temp
-
-
-       # traces = np.random.normal(0, 3, size=(num_traces, self.num_features))
-
-        leakage_values =self.leakage_func(shares=shares, num_points=self.num_informative_features, num_traces=num_traces)
-        if not self.uni_noise:
-            traces = np.random.normal(0, self.noise, size=(num_traces, self.num_features))
-
-            for i in range(self.order + 1):
-                for j in range(self.num_informative_features):
-                    traces[: , i*self.num_informative_features + j] += leakage_values[i, j, :]
-        else:
-            traces = np.zeros((num_traces, self.num_features))
-
-            for i in range(self.order + 1):
-                for j in range(self.num_informative_features):
-                    traces[: , i*self.num_informative_features + j] += leakage_values[i, j, :]
-                    temp = np.random.uniform(low=self.noise/3, high=self.noise)
-                    traces[: , i*self.num_informative_features + j] += np.random.normal(0, temp, size=(num_traces))
-        
-        return traces, masks, shares 
-    
-    def only_informative_affine(self, num_traces):
-        masks = np.random.randint(256, size=(num_traces, self.order + 1), dtype =np.uint8)
-        rsm_masks = np.random.choice(range(1, 256), size=num_traces)
-        masks[:, 0] = rsm_masks
-        
-        shares = np.zeros((num_traces, self.order + 1), dtype=np.uint8)
-
-        for i in range(self.order):
-            shares[:, i] = masks[:, i].copy()
-        temp = masks[:, 0].copy()
-        for j in range(len(temp)):
-            # print(j)
-            temp[j] = multGF256(temp[j], masks[j, self.order]) 
-        for i in range(1, self.order):
-            temp = temp ^ masks[:, i]
-        shares[:, self.order] = temp
-        
-       # traces = np.random.normal(0, 3, size=(num_traces, self.num_features))
-
-        leakage_values =self.leakage_func(shares=shares, num_points=self.num_informative_features, num_traces=num_traces)
-        if not self.uni_noise:
-            traces = np.append(np.random.normal(0, self.noise, size=(num_traces, self.num_features-10)), np.random.normal(0, 1, size=(num_traces, 10)), axis=1)
-            print(traces.shape)
-            
-
-            for i in range(self.order+1):
-                for j in range(self.num_informative_features):
-                    traces[: , i*self.num_informative_features + j] += leakage_values[i, j, :]
-                
-            # for j in range(10):
-            #         traces[: , 2*self.num_informative_features + j] += leakage_values[2, j, :]
-
-        else:
-            traces = np.zeros((num_traces, self.num_features))
-
-            for i in range(self.order + 1):
-                for j in range(self.num_informative_features):
-                    traces[: , i*self.num_informative_features + j] += leakage_values[i, j, :]
-                    temp = np.random.uniform(low=self.noise/3, high=self.noise)
-                    traces[: , i*self.num_informative_features + j] += np.random.normal(0, temp, size=(num_traces))
-        
-        return traces, masks, shares 
-    
-    def pick_leakage_spread(self, lm):
-        if lm == "real":
-            self.leakage_func = self.leakages_spread_real
-        elif lm == "hw":
-            self.leakage_func = self.leakage_spread_hw
-        elif lm == "bit":
-            self.leakage_func = self.leakage_spread_bit
-        elif lm == "msb":
-            self.leakage_func = self.leakage_spread_MSB
-        elif lm == "lsb":
-            self.leakage_func = self.leakage_spread_LSB
-        else:
-            self.leakage_func = self.leakages_spread
-
-    
-    def include_leakage_around_index(self, traces, index, share, leakage_values):
-        print(index)
-        
-        for j in range(len(self.pattern)):
-            traces[:, index + self.pattern[j]] += leakage_values[share, j, :] * 10
-        
-        return traces
-
-    def create_pattern(self, num_points, spread):
-        self.pattern = np.random.randint(spread*2, size=num_points) - spread//2
-    
