@@ -1,0 +1,16 @@
+name: MLP
+model:
+  _target_: src.MLP.model
+  width:
+    - 5
+    - ${label_transforms.n_classes}
+
+train_params:
+  opt:
+    _target_: torch.optim.Adam
+    _partial_: true
+    lr: 1e-3
+  steps: 20000
+  device: ${device}
+  batch: 256
+  loss_fn: ${label_transforms.loss_fn}

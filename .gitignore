@@ -1,4 +1,7 @@
 figures/
 __pycache__/
-src/datasets/__pycache__/
-pykan/
+dataset/
+results
+hydra
+*dev.ipynb
+*dev.py

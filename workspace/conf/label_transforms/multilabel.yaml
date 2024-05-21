@@ -1,0 +1,9 @@
+n_classes: 2
+transforms:
+  - _target_: src.aes_utils.ignore_mask
+  - _target_: src.aes_utils.apply_target_byte
+    target_byte: ${target_byte}
+  - _target_: src.aes_utils.calc_iv
+  - _target_: src.sca_utils.calc_multilabel
+loss_fn:
+  _target_: torch.nn.CrossEntropyLoss
