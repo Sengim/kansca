@@ -1,6 +1,8 @@
 ## Requirements (recommends)
 - Docker (docker-compose)
 - Nvidia-docker
+- Make `dataset` folder and put dataset files like `kansca/dataset/ASCAD.h5`, `kansca/dataset/ascad_variable.h5`.  
+    Note: This folder is mounted on `/mnt/d/Datasets` in the container. Please refer `docker/docker-compose.yaml`
 
 ## Usage
 ```bash
