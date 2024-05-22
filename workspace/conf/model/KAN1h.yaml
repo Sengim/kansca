@@ -1,4 +1,5 @@
-name: KAN
+name: KAN-1Hidden
+plot_graph: false
 model:
   _target_: kan.KAN
   width:

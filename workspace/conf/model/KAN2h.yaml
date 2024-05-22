@@ -1,9 +1,11 @@
-name: KANsmall
+name: KAN-2Hidden
+plot_graph: false
 model:
   _target_: kan.KAN
   width:
     - ${train.trace_len}
-    - 2
+    - 5
+    - 5
     - ${label_transforms.n_classes}
   grid: 3
   k: 3

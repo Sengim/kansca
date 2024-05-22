@@ -6,12 +6,13 @@ import matplotlib.pyplot as plt
 from src import utils
 
 
-@hydra.main(config_path='conf', config_name='config', version_base='1.1')
+@hydra.main(config_path='conf', config_name='config', version_base='1.3')
 def run(cfg):
     device = hydra.utils.instantiate(cfg.device)
     cpu = torch.device('cpu')
 
     # Prepare datasets
+    print('[INFO] Loading Dataset')
     profiling_dataset = hydra.utils.instantiate(cfg.train.dataset)
     test_dataset = hydra.utils.instantiate(cfg.test.dataset)
 
@@ -25,6 +26,7 @@ def run(cfg):
     KANds = utils.to_KAN_dataset(train_dataloader, test_dataloader)
 
     # Prepare model
+    print('[INFO] Start training process')
     model = hydra.utils.instantiate(cfg.model.model)
     model = model.to(device)
 
@@ -33,12 +35,17 @@ def run(cfg):
         KANds,
         **hydra.utils.instantiate(cfg.model.train_params)
         )
-    _ = model(KANds['test_input'].to(device))
-    model = model.to(cpu)
-    model.plot(
-        folder=Path(cfg.save_path, f'{cfg.model.name}_plot'), scale=10)
-    plt.savefig(Path(cfg.save_path, f'{cfg.model.name}_plot.png', dpi=300))
 
+    if cfg.model.plot_graph:
+        print('[INFO] Make plot of KAN model')
+        _ = model(KANds['test_input'].to(device))
+        model = model.to(cpu)
+        model.plot(
+            folder=Path(cfg.save_path, f'{cfg.model.name}_plot'), scale=10)
+        plt.savefig(Path(cfg.save_path, f'{cfg.model.name}_plot.png', dpi=300))
+
+    print(
+        f'[INFO] Save trained model to {cfg.save_path}/{cfg.model_name}.ckpt')
     Path(cfg.save_path).mkdir(exist_ok=True, parents=True)
     model.save_ckpt(cfg.model_name+'.ckpt', cfg.save_path)
 

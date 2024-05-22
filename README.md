@@ -12,7 +12,7 @@ $ docker compose up
 ```
 
 ## Note
-- `train_DNN/KAN.py`, `eval_DNN/KAN.py`(, `run.sh`): Simply train and evaluate models
+- `exp/*.sh`: Train and evaluate in each conditions
 - `plot_symbolic.ipynb`: Show symbolic functions in the KAN lib
 - `ASCADv_SNR.ipynb`: Plot SNR graph in ASCADv  
     Note: since it does not contain r_in and r_out in the mask, SNR can't calculate in the ASCADf dataset.
