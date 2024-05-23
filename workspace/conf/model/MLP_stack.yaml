@@ -1,12 +1,16 @@
-name: MLP
+name: MLP_stack
 model:
   _target_: src.dnn.from_yaml
   layers:
     - _target_: torch.nn.LazyLinear
-      out_features: 5
+      out_features: 256
     - _target_: torch.nn.ReLU
     - _target_: torch.nn.LazyLinear
-      out_features: ${label_transforms.n_classes}
+      out_features: 64
+    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.LazyLinear
+      out_features: ${train.trace_len}
+    - _target_: torch.nn.Sigmoid
 
 train_params:
   opt:

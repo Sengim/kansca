@@ -47,3 +47,14 @@ def make_label_hyposesis(attack_dataset, key_hyposesis):
     label_hyposesis = np.array(label_hyposesis, dtype=np.int32)
 
     return label_hyposesis
+
+
+class StackedModel(torch.nn.Module):
+    def __init__(self, kan, dnn):
+        super().__init__()
+        self.dnn = dnn
+        self.kan = kan
+
+    def forward(self, x):
+        y = self.dnn(x)
+        return self.kan(y)
