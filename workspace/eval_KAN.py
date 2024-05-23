@@ -48,7 +48,8 @@ def run(cfg):
     print(f'[INFO] Label distributioins: {partial_sum}')
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    _ = seaborn.heatmap(confmat/partial_sum, cmap='Blues')
+    _ = seaborn.heatmap(
+        confmat, cmap='Blues', annot=True, fmt='.0f')
     ax.set_title(f'Accuracy: {accuracy:.2f}')
     fig.savefig(Path(cfg.save_path, f'{cfg.model.name}_confmat.png'), dpi=300)
 

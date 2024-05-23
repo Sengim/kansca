@@ -50,7 +50,7 @@ def run(cfg):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     _ = seaborn.heatmap(
-        confmat/partial_sum, cmap='Blues', annot=True, fmt='.3f')
+        confmat, cmap='Blues', annot=True, fmt='.0f')
     ax.set_title(f'Accuracy: {accuracy:.2f}')
     fig.savefig(Path(cfg.save_path, f'{cfg.model.name}_confmat.png'), dpi=300)
 
