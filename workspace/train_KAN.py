@@ -23,7 +23,9 @@ def run(cfg):
     test_dataloader = torch.utils.data.DataLoader(
         test_dataset, batch_size=cfg.test.batch_size, shuffle=False
     )
-    KANds = utils.to_KAN_dataset(train_dataloader, test_dataloader)
+    KANds = utils.to_KAN_dataset(
+        train_dataloader, test_dataloader,
+        cfg.trace_transforms.dtype, cfg.label_transforms.dtype, device=device)
 
     # Prepare model
     print('[INFO] Start training process')

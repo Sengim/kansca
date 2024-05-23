@@ -39,6 +39,8 @@ def run(cfg):
 
     # Calc confmat
     labels = torch.cat(labels).numpy()
+    if labels.ndim == 2:
+        labels = np.argmax(labels, axis=1)
     preds_class = np.argmax(preds, axis=1)
     accuracy = np.mean(labels == preds_class)
     confmat = sklearn.metrics.confusion_matrix(labels, preds_class)

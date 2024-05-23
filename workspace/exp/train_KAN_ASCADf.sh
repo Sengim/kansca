@@ -10,12 +10,14 @@ python train_KAN.py --run \
     dataset@train=ASCADf_profiling \
     dataset@test=ASCADf_attack \
     save_path=${result} \
-    model.plot_graph=false
+    model.plot_graph=false \
+    label_transforms=hw3
 
 python eval_KAN.py --run \
     model=KAN1h \
     dataset@train=ASCADf_profiling \
     dataset@test=ASCADf_attack \
-    save_path=${result}
+    save_path=${result} \
+    label_transforms=hw3
 
 cd exp

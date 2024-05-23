@@ -21,6 +21,17 @@ def calc_hw(v):  # Calculate Hamming weight
     return hw_table[v]
 
 
+def calc_v_eq_n(n):
+    def f(v, n):
+        return int(v == n)
+    return lambda v: f(v, n)
+
+
+def to_onehot(n_classes):
+    eye = np.eye(n_classes)
+    return lambda v: eye[v]
+
+
 def calc_multilabel(v):  # Calculate multilabel
     return [calc_bit(v, i) for i in range(8)]
 

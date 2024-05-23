@@ -5,7 +5,10 @@ transforms:
   - _target_: src.aes_utils.apply_target_byte
     target_byte: ${target_byte}
   - _target_: src.aes_utils.calc_iv
-  - _target_: src.sca_utils.calc_LSB
+  - _target_: src.sca_utils.calc_hw
+    _partial_: true
+  - _target_: src.sca_utils.calc_v_eq_n
+    n: 3
   - _target_: src.sca_utils.to_onehot
     n_classes: ${label_transforms.n_classes}
 loss_fn:

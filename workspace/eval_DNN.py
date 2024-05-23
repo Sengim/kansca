@@ -40,6 +40,8 @@ def run(cfg):
 
     # Calc confmat
     labels = torch.cat(labels).numpy()
+    if labels.ndim == 2:
+        labels = np.argmax(labels, axis=1)
     preds_class = np.argmax(preds, axis=1)
     accuracy = np.mean(labels == preds_class)
     confmat = sklearn.metrics.confusion_matrix(labels, preds_class)
@@ -47,7 +49,8 @@ def run(cfg):
     print(f'[INFO] Label distributioins: {partial_sum}')
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    _ = seaborn.heatmap(confmat/partial_sum, cmap='Blues')
+    _ = seaborn.heatmap(
+        confmat/partial_sum, cmap='Blues', annot=True, fmt='.3f')
     ax.set_title(f'Accuracy: {accuracy:.2f}')
     fig.savefig(Path(cfg.save_path, f'{cfg.model.name}_confmat.png'), dpi=300)
 

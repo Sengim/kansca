@@ -1,4 +1,6 @@
+# UNDER CONSTRUCTION: DO NOT USE
 n_classes: 2
+dtype: float32
 transforms:
   - _target_: src.aes_utils.ignore_mask
   - _target_: src.aes_utils.apply_target_byte

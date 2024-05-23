@@ -1,4 +1,5 @@
 n_classes: 9
+dtype: int64
 transforms:
   - _target_: src.aes_utils.ignore_mask
   - _target_: src.aes_utils.apply_target_byte
