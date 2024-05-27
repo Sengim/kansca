@@ -2,8 +2,23 @@ import torch
 import numpy as np
 
 
+def to_torch(v):
+    if isinstance(v, torch.Tensor):
+        return v
+    else:
+        return torch.tensor(v)
+
+
+def to_float(v):
+    return v.to(torch.float32)
+
+
+def to_long(v):
+    return v.to(torch.int64)
+
+
 def to_KAN_dataset(
-        train_dataloader, test_dataloader, dtype_x, dtype_t,
+        train_dataloader, test_dataloader,
         device=torch.device('cpu')):
     """ Make dataset for KAN training from torch.utils.data.DataLoader
 
@@ -29,23 +44,22 @@ def to_KAN_dataset(
     KANds = {}
     # Training data
     x, t = extract_samples(train_dataloader)
-    KANds['train_input'] = x.to(getattr(torch, dtype_x)).to(device)
-    KANds['train_label'] = t.to(getattr(torch, dtype_t)).to(device)
+    KANds['train_input'] = x.to(device)
+    KANds['train_label'] = t.to(device)
 
     # Test (attack) data
     x, t = extract_samples(test_dataloader)
-    KANds['test_input'] = x.to(getattr(torch, dtype_x)).to(device)
-    KANds['test_label'] = t.to(getattr(torch, dtype_t)).to(device)
+    KANds['test_input'] = x.to(device)
+    KANds['test_label'] = t.to(device)
 
     return KANds
 
 
-def make_label_hyposesis(attack_dataset, key_hyposesis):
+def make_label_hyposesis(attack_dataset, key_hyposesis, one_hot=False):
     label_hyposesis = []
     for k in key_hyposesis:
         attack_dataset.set_key_hyposesis(k)
-        # If the label is one_hot:
-        if not isinstance(attack_dataset[0][1], int):
+        if one_hot:  # If the label is one_hot:
             label_hyposesis.append(
                 [np.argmax(v[1], axis=0) for v in attack_dataset])
         else:

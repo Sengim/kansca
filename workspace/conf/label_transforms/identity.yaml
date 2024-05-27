@@ -1,9 +1,14 @@
 n_classes: 256
-dtype: int64
+one_hot: false
 transforms:
   - _target_: src.aes_utils.ignore_mask
   - _target_: src.aes_utils.apply_target_byte
     target_byte: ${target_byte}
   - _target_: src.aes_utils.calc_iv
+  - _target_: src.utils.to_torch
+    _partial_: true
+  - _target_: src.utils.to_long
+    _partial_: true
 loss_fn:
   _target_: torch.nn.CrossEntropyLoss
+  

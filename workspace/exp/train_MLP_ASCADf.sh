@@ -13,8 +13,9 @@ python train_DNN.py --run \
 
 python eval_DNN.py --run \
     model=MLP \
+    dataset@train=ASCADf_profiling \
     dataset@test=ASCADf_attack \
-    save_path=${result}\
+    save_path=${result} \
     label_transforms=hw
 
 cd exp

@@ -25,7 +25,7 @@ def run(cfg):
     )
     KANds = utils.to_KAN_dataset(
         train_dataloader, test_dataloader,
-        cfg.trace_transforms.dtype, cfg.label_transforms.dtype, device=device)
+        device=device)
 
     # Prepare model
     print('[INFO] Start training process')

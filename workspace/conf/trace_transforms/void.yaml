@@ -1,2 +1,6 @@
 dtype: float32
-transforms: []
+transforms:
+  - _target_: src.utils.to_torch
+    _partial_: true
+  - _target_: src.utils.to_float
+    _partial_: true

@@ -58,7 +58,7 @@ def run(cfg):
     correct_key = attack_dataset.key[0][cfg.target_byte]
     key_hyposesis = range(256)
     label_hyposesis = utils.make_label_hyposesis(
-        attack_dataset, key_hyposesis)
+        attack_dataset, key_hyposesis, one_hot=cfg.label_transforms.one_hot)
     ge = sca_utils.calc_guessing_entropy(
         preds, label_hyposesis, correct_key,
         cfg.n_attack_traces, n_trial=cfg.n_trials)

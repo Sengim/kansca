@@ -33,7 +33,7 @@ def to_onehot(n_classes):
 
 
 def calc_multilabel(v):  # Calculate multilabel
-    return [calc_bit(v, i) for i in range(8)]
+    return np.array([calc_bit(v, i) for i in range(8)])
 
 
 # From https://github.com/Sengim/kansca/tree/main
