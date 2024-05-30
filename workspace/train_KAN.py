@@ -1,8 +1,6 @@
 import torch
 import hydra
 from pathlib import Path
-import matplotlib.pyplot as plt
-
 from src import utils
 
 
@@ -38,18 +36,10 @@ def run(cfg):
         **hydra.utils.instantiate(cfg.model.train_params)
         )
 
-    if cfg.model.plot_graph:
-        print('[INFO] Make plot of KAN model')
-        _ = model(KANds['test_input'].to(device))
-        model = model.to(cpu)
-        model.plot(
-            folder=Path(cfg.save_path, f'{cfg.model.name}_plot'), scale=10)
-        plt.savefig(Path(cfg.save_path, f'{cfg.model.name}_plot.png', dpi=300))
-
     print(
         f'[INFO] Save trained model to {cfg.save_path}/{cfg.model_name}.ckpt')
     Path(cfg.save_path).mkdir(exist_ok=True, parents=True)
-    model.save_ckpt(cfg.model_name+'.ckpt', cfg.save_path)
+    model.to(cpu).save_ckpt(cfg.model_name+'.ckpt', cfg.save_path)
 
 
 if __name__ == '__main__':

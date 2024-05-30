@@ -23,5 +23,5 @@ n_trials: 40
 
 # Paths
 dataset_path: /mnt/d/Datasets
-save_path: /workspace/results
+save_path: /workspace/results/${model_name}
 model_name: ${model.name}

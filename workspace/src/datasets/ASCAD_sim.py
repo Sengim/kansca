@@ -15,7 +15,7 @@ def RandomDataset(n_traces, **kwargs):
 class Dataset(base.BaseDataset):
     def __init__(
         self,
-        pt, key, masks, target_byte, sigma=0.5,
+        pt, key, masks, target_byte, sigma=0.0,
         **kwargs
     ):
         self.plaintext = pt
@@ -49,13 +49,19 @@ class Dataset(base.BaseDataset):
         pt = self.plaintext[i, self.target_byte]
         key = self.key[i, self.target_byte]
         mask = self.masks[i, self.target_byte]
-        r_out = self.masks[i, 2]
 
         unmasked_sbox_out = aes_utils.aes_sbox[pt ^ key]
-        masked_sbox_out = aes_utils.aes_sbox[pt ^ key] ^ r_out
-        sbox_out_mask = r_out
         masked_sbox_out_linear = aes_utils.aes_sbox[pt ^ key] ^ mask
         sbox_out_mask_linear = mask
+
+        if self.masks.shape[1] < 18:
+            # ASCADf doesn't have in/out masks
+            return (unmasked_sbox_out, masked_sbox_out_linear,
+                    sbox_out_mask_linear)
+
+        r_out = self.masks[i, 2]
+        masked_sbox_out = aes_utils.aes_sbox[pt ^ key] ^ r_out
+        sbox_out_mask = r_out
 
         return (unmasked_sbox_out, masked_sbox_out,
                 sbox_out_mask, masked_sbox_out_linear,
