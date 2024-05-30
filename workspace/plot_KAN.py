@@ -47,17 +47,19 @@ def run(cfg):
     model = hydra.utils.instantiate(cfg.model.model)
     model.load_ckpt(cfg.model_name+'.ckpt', cfg.save_path)
 
+    print('[INFO] Making plot with profiling traces')
     _ = model(prof_inputs)
     model.plot(folder=cfg.save_path+'/profiling/figures')
     plt.savefig(
-        Path(cfg.save_path, 'profiling', f'{cfg.model.name}_plot.png'),
+        Path(cfg.save_path, f'{cfg.model.name}_profiling.png'),
         dpi=300)
     plot(cfg, model, 'profiling')
 
+    print('[INFO] Making plot with attack traces')
     _ = model(test_inputs)
     model.plot(folder=cfg.save_path+'/attack')
     plt.savefig(
-        Path(cfg.save_path, 'attack', f'{cfg.model.name}_plot.png'),
+        Path(cfg.save_path, f'{cfg.model.name}_attack.png'),
         dpi=300)
     plot(cfg, model, 'attack')
 
