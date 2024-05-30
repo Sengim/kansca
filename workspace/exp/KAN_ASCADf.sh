@@ -11,13 +11,13 @@ python train_KAN.py --run \
     dataset@test=ASCADf_attack \
     save_path=${result} \
     model.plot_graph=false \
-    label_transforms=identity
+    label_transforms=lsb
 
 python eval_KAN.py --run \
     model=KAN1h \
     dataset@train=ASCADf_profiling \
     dataset@test=ASCADf_attack \
     save_path=${result} \
-    label_transforms=identity
+    label_transforms=lsb
 
 cd exp
