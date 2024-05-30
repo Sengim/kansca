@@ -1,4 +1,4 @@
-dtype: float32
+output_size: ${train.trace_len}
 transforms:
   - _target_: src.utils.to_torch
     _partial_: true

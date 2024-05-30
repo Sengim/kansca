@@ -1,22 +1,21 @@
-import torch
+from . import base
 import h5py
 from pathlib import Path
 import numpy as np
 
 
-class Dataset(torch.utils.data.Dataset):
+class Dataset(base.BaseDataset):
     def __init__(
         self,
         dataset_path,
-        trace_transforms=[],
-        label_transforms=[],
         profiling=True,
-        scale=True
+        scale=True,
+        **kwargs
     ):
+        super().__init__(**kwargs)
 
         self.dataset_path = dataset_path
-        self.trace_transforms = trace_transforms
-        self.label_transforms = label_transforms
+        self._external_key = False
 
         # Load data
         if profiling:
@@ -51,19 +50,3 @@ class Dataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return self._len
-
-    def set_key_hyposesis(self, key):
-        self._external_key = True
-        self.key = key
-
-    def __getitem__(self, i):
-        x = self.traces[i]
-        for f in self.trace_transforms:
-            x = f(x)
-        t = (self.plaintext[i], self.key[i], self.masks[i])
-        for g in self.label_transforms:
-            if isinstance(t, tuple):
-                t = g(*t)
-            else:
-                t = g(t)
-        return x, t

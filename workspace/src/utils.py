@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+from tqdm import tqdm
 
 
 def to_torch(v):
@@ -57,13 +58,14 @@ def to_KAN_dataset(
 
 def make_label_hyposesis(attack_dataset, key_hyposesis, one_hot=False):
     label_hyposesis = []
-    for k in key_hyposesis:
+    for k in tqdm(key_hyposesis,
+                  desc="Making label hyposesis [/key hyposesis]"):
         attack_dataset.set_key_hyposesis(k)
-        if one_hot:  # If the label is one_hot:
-            label_hyposesis.append(
-                [np.argmax(v[1], axis=0) for v in attack_dataset])
-        else:
-            label_hyposesis.append([v[1] for v in attack_dataset])
+        tmp = np.array([attack_dataset.get_label(v)
+                        for v in range(len(attack_dataset))])
+        if one_hot:
+            tmp = tmp.argmax(axis=1)
+        label_hyposesis.append(tmp)
     label_hyposesis = np.array(label_hyposesis, dtype=np.int32)
 
     return label_hyposesis

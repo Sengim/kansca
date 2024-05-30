@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 
 
 hw_table = [bin(i).count('1') for i in range(256)]
@@ -34,6 +35,16 @@ def to_onehot(n_classes):
 
 def calc_multilabel(v):  # Calculate multilabel
     return np.array([calc_bit(v, i) for i in range(8)])
+
+
+def set_pois(pois):
+    def f(trace, pois):
+        t = []
+        for p in pois:
+            t.append(trace[p[0]:p[1]:p[2]])
+        return np.concatenate(t)
+
+    return lambda trace: f(trace, pois=pois)
 
 
 # From https://github.com/Sengim/kansca/tree/main
@@ -88,7 +99,7 @@ def calc_guessing_entropy(
 
     # Calculate guessing entropy
     correct_key_ranks = []
-    for _ in range(n_trial):
+    for _ in tqdm(range(n_trial), desc="Calculating GE [/trials]"):
         idx = np.random.choice(
             range(len(preds)), n_attack_traces, replace=False
         )

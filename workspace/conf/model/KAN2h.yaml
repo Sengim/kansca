@@ -3,7 +3,7 @@ plot_graph: false
 model:
   _target_: kan.KAN
   width:
-    - ${train.trace_len}
+    - ${train.feature_size}
     - 5
     - 5
     - ${label_transforms.n_classes}

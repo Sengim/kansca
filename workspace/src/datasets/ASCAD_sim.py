@@ -1,3 +1,4 @@
+from . import base
 import numpy as np
 from src import aes_utils, sca_utils
 
@@ -11,19 +12,16 @@ def RandomDataset(n_traces, **kwargs):
     return ds
 
 
-class Dataset:
+class Dataset(base.BaseDataset):
     def __init__(
         self,
         pt, key, masks, target_byte, sigma=0.5,
-        trace_transforms=[],
-        label_transforms=[]
+        **kwargs
     ):
         self.plaintext = pt
         self.key = key
         self.masks = masks
         self.sigma = sigma
-        self.trace_transforms = trace_transforms
-        self.label_transforms = label_transforms
         self._external_key = False
         self._len = pt.shape[0]
         self.target_byte = target_byte
@@ -73,26 +71,3 @@ class Dataset:
 
     def __len__(self):
         return self._len
-
-    def set_key_hyposesis(self, key):
-        self._external_key = True
-        self.ext_key = np.ones(
-            (self.key.shape[1], ), dtype=np.int32) * key
-
-    def __getitem__(self, i):
-        iv = self.calc_ivs(i)
-        x = self.gen_trace(iv[1:])
-        for f in self.trace_transforms:
-            x = f(x)
-
-        if self._external_key:
-            t = (self.plaintext[i], self.ext_key, self.masks[i])
-        else:
-            t = (self.plaintext[i], self.key[i], self.masks[i])
-        for g in self.label_transforms:
-            if isinstance(t, tuple):
-                t = g(*t)
-            else:
-                t = g(t)
-
-        return x, t
