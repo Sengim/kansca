@@ -6,16 +6,18 @@ hw_table = [bin(i).count('1') for i in range(256)]
 
 
 # Calculate whether the pos-th bit is 0 or 1
-def calc_bit(v, pos):
-    return (v & (2**pos)) >> pos
+def calc_bit(pos):
+    return lambda v: (v & (2**pos)) >> pos
 
 
-def calc_LSB(v):  # alias to calc_bit(v, 0)
-    return calc_bit(v, 0)
+def calc_LSB():  # alias to calc_bit(v, 0)
+    f = calc_bit(0)
+    return lambda v: f(v)
 
 
-def calc_MSB(v):  # alias to calc_bit(v, 7)
-    return calc_bit(v, 7)
+def calc_MSB():  # alias to calc_bit(v, 7)
+    f = calc_bit(7)
+    return lambda v: f(v)
 
 
 def calc_hw(v):  # Calculate Hamming weight
@@ -33,8 +35,8 @@ def to_onehot(n_classes):
     return lambda v: eye[v]
 
 
-def calc_multilabel(v):  # Calculate multilabel
-    return np.array([calc_bit(v, i) for i in range(8)])
+def calc_multilabel():  # Calculate multilabel
+    return lambda v: np.array([calc_bit(i)(v) for i in range(8)])
 
 
 def set_pois(pois):

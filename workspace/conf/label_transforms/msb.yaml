@@ -6,7 +6,6 @@ transforms:
     target_byte: ${target_byte}
   - _target_: src.aes_utils.calc_iv
   - _target_: src.sca_utils.calc_MSB
-    _partial_: true
   - _target_: src.sca_utils.to_onehot
     n_classes: ${label_transforms.n_classes}
   - _target_: src.utils.to_torch

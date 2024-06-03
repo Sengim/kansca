@@ -1,5 +1,4 @@
 name: KAN-1Hidden
-plot_graph: false
 model:
   _target_: kan.KAN
   width:
@@ -21,5 +20,4 @@ train_params:
   lamb_entropy: 0.2
   lr: 1e-3
   batch: 256
-  loss_fn:
-    _target_: torch.nn.CrossEntropyLoss
+  loss_fn: ${label_transforms.loss_fn}
