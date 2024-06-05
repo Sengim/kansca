@@ -1,5 +1,5 @@
 n_classes: 2
-one_hot: false
+one_hot: true
 transforms:
   - _target_: src.aes_utils.ignore_mask
   - _target_: src.aes_utils.apply_target_byte
