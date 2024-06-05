@@ -1,5 +1,12 @@
 #!/bin/bash
-# Train KAN model with ASCAD variable-key dataset.
+# Train KAN model with ASCAD variable-key dataset. (3rd-byte)
+# Training traces are acquired with variable (random) keys.
+# Attack traces are acquired with fixed keys.
+# Input trace is Z-score-normalized based on statistics of profiling traces.
+# Use all sample points in the traces (including all leakages)
+# Target label is each bit of (unmasked) Sbox output.
+# KAN architecture is [1400, 2, 2]
+# (1400 points of trace input, 5 hidden nodes, 2 class probability)
 
 result=/workspace/results/KAN_ASCADv_ALL
 

@@ -1,5 +1,14 @@
 #!/bin/bash
-# Train KAN model with ASCAD variable-key dataset.
+# Train KAN model with ASCAD variable-key dataset. (3rd-byte)
+# Training traces are acquired with variable (random) keys.
+# Attack traces are acquired with fixed keys.
+# Input trace is Z-score-normalized based on statistics of profiling traces.
+# Use two known leakage peaks (please refer the ASCADv_SNR.ipynb)
+# - Masked Sbox output (Sbox(p[2]^k[2])^r_out), PoI: 1071
+# - Mask of Sbox output (r_out), PoI: 188
+# Target label is each bit of (unmasked) Sbox output.
+# KAN architecture is [2, 2, 2]
+# (2 leakages input, 2 hidden nodes, 2 class probability)
 
 result=/workspace/results/KAN_ASCADv_Leakage
 
