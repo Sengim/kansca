@@ -54,11 +54,6 @@ class Dataset(base.BaseDataset):
         masked_sbox_out_linear = aes_utils.aes_sbox[pt ^ key] ^ mask
         sbox_out_mask_linear = mask
 
-        if self.masks.shape[1] < 18:
-            # ASCADf doesn't have in/out masks
-            return (unmasked_sbox_out, masked_sbox_out_linear,
-                    sbox_out_mask_linear)
-
         r_out = self.masks[i, 2]
         masked_sbox_out = aes_utils.aes_sbox[pt ^ key] ^ r_out
         sbox_out_mask = r_out

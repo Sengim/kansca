@@ -28,7 +28,7 @@ python eval_KAN.py --multirun \
     dataset@test=ASCADv_attack \
     label_transforms=bit \
     label_transforms.transforms.3.pos=0,1,2,3,4,5,6,7 \
-    ssave_path=${result}/\${label_transforms.transforms.3.pos}
+    save_path=${result}/\${label_transforms.transforms.3.pos}
 
 python plot_KAN.py --multirun \
     model=KAN1h \

@@ -35,9 +35,10 @@ class Dataset(base.BaseDataset):
             self.plaintext = np.array(
                 f[root_key+'/metadata']['plaintext'], dtype=np.uint8)
             self.key = np.array(f[root_key+'/metadata']['key'], dtype=np.uint8)
-            self.masks = np.array(
+            self.masks = np.zeros((self.plaintext.shape[0], 18), dtype=np.uint8)
+            self.masks[:, 2:] = np.array(
                 f[root_key+'/metadata']['masks'], dtype=np.uint8)
-        self._len = self.traces.shape[0]
+        self._len = self.plaintext.shape[0]
         self.trace_len = 700  # Constant
 
     # Calculate mean and sandard diviation of the trace
