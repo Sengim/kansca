@@ -10,7 +10,7 @@
 # KAN architecture is [2, 2, 2]
 # (2 leakages input, 2 hidden nodes, 2 class probability)
 
-result=/workspace/results/KAN_ASCADv_Leakage
+result=/workspace/results/KAN_ASCADv_PoIBoth
 
 cd ..
 
