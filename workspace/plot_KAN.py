@@ -3,27 +3,7 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import hydra
-
-
-def plot(cfg, model, folder_name):
-    Path(cfg.save_path, folder_name).mkdir(exist_ok=True, parents=True)
-    for idx, _ in enumerate(cfg.model.model.width[:-1]):
-        for i in range(cfg.model.model.width[idx]):
-            for j in range(cfg.model.model.width[idx+1]):
-                inputs = model.spline_preacts[idx][:, j, i]
-                inputs = inputs.to(torch.device('cpu'))
-                outputs = model.spline_postacts[idx][:, j, i]
-                outputs = outputs.to(torch.device('cpu'))
-                rank = np.argsort(inputs)
-                inputs = inputs[rank]
-                outputs = outputs[rank]
-                fig = plt.figure()
-                ax = fig.add_subplot(111)
-                ax.plot(inputs, outputs, marker="o")
-                fig.savefig(
-                    Path(cfg.save_path, folder_name, f'{idx}.{i}.{j}.png'),
-                    dpi=300)
-                plt.close()
+from src.utils import plot_KAN
 
 
 @hydra.main(config_path='conf', config_name='config', version_base='1.3')
@@ -53,7 +33,7 @@ def run(cfg):
     plt.savefig(
         Path(cfg.save_path, f'{cfg.model.name}_profiling.png'),
         dpi=300)
-    plot(cfg, model, 'profiling')
+    plot_KAN(cfg, model, 'profiling')
 
     print('[INFO] Making plot with attack traces')
     _ = model(test_inputs)
@@ -61,7 +41,7 @@ def run(cfg):
     plt.savefig(
         Path(cfg.save_path, f'{cfg.model.name}_attack.png'),
         dpi=300)
-    plot(cfg, model, 'attack')
+    plot_KAN(cfg, model, 'attack')
 
 
 if __name__ == '__main__':

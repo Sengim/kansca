@@ -1,6 +1,8 @@
 import torch
 import numpy as np
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+from pathlib import Path
 
 
 def to_torch(v):
@@ -80,3 +82,24 @@ class StackedModel(torch.nn.Module):
     def forward(self, x):
         y = self.dnn(x)
         return self.kan(y)
+
+
+def plot_KAN(cfg, model, folder_name):
+    Path(cfg.save_path, folder_name).mkdir(exist_ok=True, parents=True)
+    for idx, _ in enumerate(cfg.model.model.width[:-1]):
+        for i in range(cfg.model.model.width[idx]):
+            for j in range(cfg.model.model.width[idx+1]):
+                inputs = model.spline_preacts[idx][:, j, i]
+                inputs = inputs.to(torch.device('cpu'))
+                outputs = model.spline_postacts[idx][:, j, i]
+                outputs = outputs.to(torch.device('cpu'))
+                rank = np.argsort(inputs)
+                inputs = inputs[rank]
+                outputs = outputs[rank]
+                fig = plt.figure()
+                ax = fig.add_subplot(111)
+                ax.plot(inputs, outputs, marker="o")
+                fig.savefig(
+                    Path(cfg.save_path, folder_name, f'{idx}.{i}.{j}.png'),
+                    dpi=300)
+                plt.close()

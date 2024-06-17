@@ -9,6 +9,8 @@
 # KAN architecture is [1, 2, 2]
 # (1 leakages input, 2 hidden nodes, 2 class probability)
 
+./ASCADfMaskOfSboxOut.sh
+
 result=/workspace/results/ASCADfMaskedSboxOut
 
 cd ..
@@ -47,7 +49,19 @@ python plot_KAN.py --multirun \
     trace_transforms.output_size=1 \
     label_transforms=bit \
     label_transforms.transforms.3.pos=0,1,2,3,4,5,6,7 \
-    save_path=${result}/\${label_transforms.transforms.3.pos} \
-    n_attack_traces=10000
+    save_path=${result}/\${label_transforms.transforms.3.pos}
+
+python make_symbolic.py --multirun \
+    model=KAN1h \
+    model.model.width.1=2 \
+    model.model.symbolic_enabled=true \
+    dataset@train=ASCADf_profiling \
+    dataset@test=ASCADf_attack \
+    trace_transforms=set_poi \
+    trace_transforms.transforms.0.pois="[[517, 518, 1]]" \
+    trace_transforms.output_size=1 \
+    label_transforms=bit \
+    label_transforms.transforms.3.pos=0,1,2,3,4,5,6,7 \
+    save_path=${result}/\${label_transforms.transforms.3.pos}
 
 cd exp

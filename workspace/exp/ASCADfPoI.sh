@@ -47,7 +47,19 @@ python plot_KAN.py --multirun \
     trace_transforms.output_size=2 \
     label_transforms=bit \
     label_transforms.transforms.3.pos=0,1,2,3,4,5,6,7 \
-    save_path=${result}/\${label_transforms.transforms.3.pos} \
-    n_attack_traces=10000
+    save_path=${result}/\${label_transforms.transforms.3.pos}
+
+python make_symbolic.py --multirun \
+    model=KAN1h \
+    model.model.width.1=2 \
+    model.model.symbolic_enabled=true \
+    dataset@train=ASCADf_profiling \
+    dataset@test=ASCADf_attack \
+    trace_transforms=set_poi \
+    trace_transforms.transforms.0.pois="[[156, 157, 1],[517, 518, 1]]" \
+    trace_transforms.output_size=2 \
+    label_transforms=bit \
+    label_transforms.transforms.3.pos=0,1,2,3,4,5,6,7 \
+    save_path=${result}/\${label_transforms.transforms.3.pos}
 
 cd exp
