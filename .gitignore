@@ -1,6 +1,7 @@
 figures/
 __pycache__/
 dataset/
+!*/conf/dataset
 results
 hydra
 *dev.ipynb
