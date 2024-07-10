@@ -9,7 +9,7 @@ model:
   k: 3
   device: ${device}
   seed: 0
-  symbolic_enabled: false
+  symbolic_enabled: true
 
 train_params:
   opt: Adam
