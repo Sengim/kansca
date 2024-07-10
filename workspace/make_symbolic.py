@@ -3,8 +3,6 @@ import hydra
 from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
-import sklearn.metrics
-import seaborn
 import pickle
 
 from src import utils, sca_utils
@@ -13,7 +11,6 @@ from src import utils, sca_utils
 @hydra.main(config_path='conf', config_name='config', version_base='1.3')
 def run(cfg):
     device = hydra.utils.instantiate(cfg.device)
-    cpu = torch.device('cpu')
 
     # Prepare datasets
     print('[INFO] Loading Dataset')

@@ -8,8 +8,7 @@
 # Target label is each bit of (unmasked) Sbox output.
 # KAN architecture is [1, 2, 2]
 # (1 leakages input, 2 hidden nodes, 2 class probability)
-
-./ASCADfMaskOfSboxOut.sh
+#,1,2,3,4,5,6,7
 
 result=/workspace/results/ASCADfMaskedSboxOut
 
