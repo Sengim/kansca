@@ -18,6 +18,7 @@ class Dataset(base.BaseDataset):
         pt, key, masks, target_byte, sigma=0.0,
         **kwargs
     ):
+        super().__init__(**kwargs)
         self.plaintext = pt
         self.key = key
         self.masks = masks
@@ -25,6 +26,7 @@ class Dataset(base.BaseDataset):
         self._external_key = False
         self._len = pt.shape[0]
         self.target_byte = target_byte
+        self.traces = self.make_traces()
 
     def calc_ivs(self, i):
         """ Calculate intermediate variables (IVs) of 1st round
@@ -69,6 +71,11 @@ class Dataset(base.BaseDataset):
         trace /= 8  # Scale to [0, 1]
         trace += np.random.randn(*trace.shape)*self.sigma
         return trace
+
+    def make_traces(self):
+        tr = [self.gen_trace(self.calc_ivs(i))[np.newaxis, ...]
+              for i in range(len(self))]
+        return np.concatenate(tr, axis=0)
 
     def __len__(self):
         return self._len
