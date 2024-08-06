@@ -56,7 +56,7 @@ class Dataset(base.BaseDataset):
         masked_sbox_out_linear = aes_utils.aes_sbox[pt ^ key] ^ mask
         sbox_out_mask_linear = mask
 
-        r_out = self.masks[i, 2]
+        r_out = self.masks[i, -1]
         masked_sbox_out = aes_utils.aes_sbox[pt ^ key] ^ r_out
         sbox_out_mask = r_out
 

@@ -35,7 +35,7 @@ def run(cfg):
         preds_class = preds_class.astype(np.int32)
     else:
         preds_class = np.argmax(preds, axis=1)
-    accuracy = np.mean(labels == preds)
+    accuracy = np.mean(labels == preds_class)
     _ = utils.make_confmat(
         preds_class, labels, accuracy, cfg.save_path)
 

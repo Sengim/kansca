@@ -134,7 +134,7 @@ def make_prediction(model, test_dl, device, one_hot, yodens_threshold=False):
             y = torch.nn.functional.sigmoid(y)
         inputs.append(x.to(cpu))
         preds.append(y.to(cpu))
-        labels.append(batch[1])
+        labels.append(batch[1].to(cpu))
     inputs = torch.cat(inputs).detach().numpy()
     preds = torch.cat(preds).detach().numpy()
     labels = torch.cat(labels, dim=0).numpy()

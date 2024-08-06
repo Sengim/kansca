@@ -20,6 +20,26 @@ aes_sbox = np.array([
 ])
 
 
+def calc_snr(target_byte, target_snr):
+    def tmp(pt, k, m):
+        pt = pt[target_byte]
+        key = k[target_byte]
+        mask = m[target_byte]
+        r_out = m[-1]
+
+        if target_snr == 2:
+            return aes_sbox[pt ^ key] ^ r_out
+        elif target_snr == 3:
+            return r_out
+        elif target_snr == 4:
+            return aes_sbox[pt ^ key] ^ mask
+        elif target_snr == 5:
+            return mask
+
+        return None
+    return tmp
+
+
 def ignore_mask():
     return lambda pt, k, m: (pt, k)
 
