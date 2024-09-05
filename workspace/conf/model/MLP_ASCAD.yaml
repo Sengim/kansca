@@ -3,22 +3,22 @@ model:
   _target_: src.dnn.from_yaml
   layers:
     - _target_: torch.nn.LazyLinear
-      out_features: 500
+      out_features: 200
     - _target_: torch.nn.Tanh
     - _target_: torch.nn.LazyLinear
-      out_features: 500
+      out_features: 200
     - _target_: torch.nn.Tanh
     - _target_: torch.nn.LazyLinear
-      out_features: 500
+      out_features: 200
     - _target_: torch.nn.Tanh
     - _target_: torch.nn.LazyLinear
-      out_features: 500
+      out_features: 200
     - _target_: torch.nn.Tanh
     - _target_: torch.nn.LazyLinear
-      out_features: 500
+      out_features: 200
     - _target_: torch.nn.Tanh
     - _target_: torch.nn.LazyLinear
-      out_features: 500
+      out_features: 200
     - _target_: torch.nn.Tanh
     - _target_: torch.nn.LazyLinear
       out_features: ${label_transforms.n_classes}

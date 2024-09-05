@@ -11,9 +11,15 @@ $ docker compose up
 # Attach container and run notebooks or scripts
 ```
 
-## Note
-- `exp/*.sh`: Train and evaluate in each conditions
-- `plot_symbolic.ipynb`: Show symbolic functions in the KAN lib
-- `ASCADv_SNR.ipynb`: Plot SNR graph in ASCADv  
-    Note: since it does not contain r_in and r_out in the mask, SNR can't calculate in the ASCADf dataset.
-- `notebook/*.ipynb`: Experiments that are run on jupyter notebook
+## Experiments
+- `simulation/KAN.sh`: train KAN with simulation data for each bit.
+- `simulation/Plot_and_symbolic.ipynb`: plot trained KAN by `simulation/KAN.sh`, fix input activations by linear function, and fine-tuning.
+- `simulation/Train_extended_grid.ipynb`: train KAN with `grid_size=17` and fixed input activations.
+- `simulation/evm_strategy.ipynb`: calculate accuracy of EVM strategy.
+- `ascad/snr/*.ipynb`: plot SNR graph for each dataset.
+- `ascad/interpret/KAN.sh|MLP.sh`: train KAN|MLP with ASCAD dataset.
+- `ascad/interpret/KAN_snr.sh`: train KAN with snr-based PoI.
+- `ascad/interpret/KAN_snr_grid3.ipynb|KAN_snr_grid17.ipynb`: train KAN with snr-based PoI and `grid_size=3|17`.
+- `ascad/interpret/Sensitivity.ipynb|Sensitivity_MLP.ipynb`: plot sensitivity graph.
+- `ascad/interpret/GE.ipynb`: plot guessing entropy graph.
+- `ascad/unbalance_leakage/regression.ipynb`: train linear regression model that predicts trace from intermediate value.

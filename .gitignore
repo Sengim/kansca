@@ -2,8 +2,8 @@ figures/
 __pycache__/
 dataset/
 !*/conf/dataset
-results
 hydra
+old
 *dev.ipynb
 *dev.py
 *dev.sh

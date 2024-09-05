@@ -1,4 +1,3 @@
-# UNDER CONSTRUCTION: DO NOT USE
 n_classes: 8
 one_hot: false
 target_snr: 2

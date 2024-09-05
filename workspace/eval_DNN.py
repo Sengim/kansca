@@ -3,8 +3,6 @@ import hydra
 from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
-import sklearn.metrics
-import seaborn
 
 from src import utils, sca_utils
 
@@ -12,7 +10,6 @@ from src import utils, sca_utils
 @hydra.main(config_path='conf', config_name='config', version_base='1.3')
 def run(cfg):
     device = hydra.utils.instantiate(cfg.device)
-    cpu = torch.device('cpu')
 
     # Load dataset
     print('[INFO] Load dataset')
@@ -29,30 +26,12 @@ def run(cfg):
     model = model.to(device)
 
     # Make predictions
-    print('[INFO] Make predictions')
-    preds = []
-    labels = []
-    for batch in attack_dl:
-        y = torch.nn.Softmax(dim=1)(model(batch[0].to(device)))
-        preds.append(y)
-        labels.append(batch[1])
-    preds = torch.cat(preds).detach().to(cpu).numpy()
-
-    # Calc confmat
-    labels = torch.cat(labels).numpy()
-    if labels.ndim == 2:
-        labels = np.argmax(labels, axis=1)
+    preds, labels, _ = utils.make_prediction(
+        model, attack_dl, device)
     preds_class = np.argmax(preds, axis=1)
     accuracy = np.mean(labels == preds_class)
-    confmat = sklearn.metrics.confusion_matrix(labels, preds_class)
-    partial_sum = np.sum(confmat, axis=1)
-    print(f'[INFO] Label distributioins: {partial_sum}')
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    _ = seaborn.heatmap(
-        confmat, cmap='Blues', annot=True, fmt='.0f')
-    ax.set_title(f'Accuracy: {accuracy:.2f}')
-    fig.savefig(Path(cfg.save_path, f'{cfg.model.name}_confmat.png'), dpi=300)
+    _ = utils.make_confmat(
+        preds_class, labels, accuracy, cfg.save_path)
 
     # Evaluate
     print('[INFO] Calculate guessing entropy')
@@ -60,8 +39,9 @@ def run(cfg):
     key_hyposesis = range(256)
     label_hyposesis = utils.make_label_hyposesis(
         attack_dataset, key_hyposesis)
+    confidence = preds
     ge = sca_utils.calc_guessing_entropy(
-        preds, label_hyposesis, correct_key,
+        confidence, label_hyposesis, correct_key,
         cfg.n_attack_traces, n_trial=cfg.n_trials)
 
     # Save results

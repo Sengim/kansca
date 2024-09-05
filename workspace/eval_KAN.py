@@ -10,7 +10,6 @@ from src import utils, sca_utils
 @hydra.main(config_path='conf', config_name='config', version_base='1.3')
 def run(cfg):
     device = hydra.utils.instantiate(cfg.device)
-    cpu = torch.device('cpu')
 
     # Load dataset
     print('[INFO] Load dataset')
@@ -27,14 +26,8 @@ def run(cfg):
 
     # Make predictions
     preds, labels, _ = utils.make_prediction(
-        model, attack_dl, device,
-        cfg.label_transforms.one_hot)
-    if not cfg.label_transforms.one_hot:
-        preds_class = np.zeros(preds.shape)
-        preds_class[preds > 0.5] = 1.0
-        preds_class = preds_class.astype(np.int32)
-    else:
-        preds_class = np.argmax(preds, axis=1)
+        model, attack_dl, device)
+    preds_class = np.argmax(preds, axis=1)
     accuracy = np.mean(labels == preds_class)
     _ = utils.make_confmat(
         preds_class, labels, accuracy, cfg.save_path)
@@ -44,11 +37,8 @@ def run(cfg):
     correct_key = attack_dataset.key[0][cfg.target_byte]
     key_hyposesis = range(256)
     label_hyposesis = utils.make_label_hyposesis(
-        attack_dataset, key_hyposesis, one_hot=cfg.label_transforms.one_hot)
-    if not cfg.label_transforms.one_hot:
-        confidence = utils.make_confidence(preds)
-    else:
-        confidence = preds
+        attack_dataset, key_hyposesis)
+    confidence = preds
     ge = sca_utils.calc_guessing_entropy(
         confidence, label_hyposesis, correct_key,
         cfg.n_attack_traces, n_trial=cfg.n_trials)

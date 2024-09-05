@@ -1,0 +1,13 @@
+n_classes: 2
+one_hot: true
+transforms:
+  - _target_: src.sca_utils.calc_bit
+    pos: 0
+  - _target_: src.sca_utils.to_onehot
+    n_classes: ${label_transforms.n_classes}
+  - _target_: src.utils.to_torch
+    _partial_: true
+  - _target_: src.utils.to_float
+    _partial_: true
+loss_fn:
+  _target_: torch.nn.BCEWithLogitsLoss
