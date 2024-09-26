@@ -110,7 +110,7 @@ def make_prediction(model, test_dl, device):
         y = model(x)
         y = torch.nn.functional.softmax(y, dim=1)
         inputs.append(x.to(cpu))
-        preds.append(y.to(cpu))
+        preds.append(y.detach().to(cpu))
         labels.append(batch[1].to(cpu))
     inputs = torch.cat(inputs).detach().numpy()
     preds = torch.cat(preds).detach().numpy()
