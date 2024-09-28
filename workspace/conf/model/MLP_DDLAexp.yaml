@@ -1,0 +1,24 @@
+name: MLP
+model:
+  _target_: src.dnn.from_yaml
+  layers:
+    - _target_: torch.nn.LazyLinear
+      out_features: 20
+    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.LazyLinear
+      out_features: 10
+    - _target_: torch.nn.ReLU
+    - _target_: torch.nn.LazyLinear
+      out_features: ${label_transforms.n_classes}
+
+train_params:
+  opt:
+    _target_: torch.optim.Adam
+    _partial_: true
+    betas: [0.9, 0.999]
+    eps: 1e-8
+    lr: 0.001
+  steps: 20000
+  device: ${device}
+  batch: 1000
+  loss_fn: ${label_transforms.loss_fn}

@@ -1,0 +1,10 @@
+flake8
+notebook
+ipywidgets
+tqdm
+scikit-learn
+seaborn
+matplotlib
+h5py
+hydra-core
+pykan==0.0.5

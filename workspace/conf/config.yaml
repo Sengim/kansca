@@ -1,0 +1,27 @@
+hydra:
+  run:
+    dir: /workspace/hydra/run/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: /workspace/hydra/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+defaults:
+  - _self_
+  - dataset@train: ASCADf_profiling
+  - dataset@test: ASCADf_attack
+  - label_transforms: identity
+  - trace_transforms: void
+  - model: KAN
+
+device:
+  _target_: torch.device
+  device: cuda
+
+# Attack details
+target_byte: 2
+n_attack_traces: 2000
+n_trials: 40
+
+# Paths
+dataset_path: /mnt/d/Datasets
+save_path: /workspace/results/${model_name}
+model_name: ${model.name}

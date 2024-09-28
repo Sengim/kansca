@@ -1,0 +1,17 @@
+services:
+  main:
+    build: '.'
+    ports:
+      - '50000:8888'  # Jupyter-notebook
+    volumes:
+      - ../workspace:/workspace
+      - ../dataset:/mnt/d/Datasets
+    working_dir: /workspace
+    command: bash -c "jupyter notebook --allow-root"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]

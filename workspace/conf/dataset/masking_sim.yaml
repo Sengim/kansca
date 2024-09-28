@@ -1,0 +1,11 @@
+trace_len: ${.dataset.n_shares}
+feature_size: ${trace_transforms.output_size}
+batch_size: 2048
+dataset:
+  _target_: src.datasets.masking_sim.Dataset
+  n_shares: 2
+  bus_width: 8
+  n_traces: -1
+  sigma: 0.0
+  trace_transforms: ${trace_transforms.transforms}
+  label_transforms: ${label_transforms.transforms}

@@ -1,0 +1,6 @@
+output_size: ${train.trace_len}
+transforms:
+  - _target_: src.utils.to_torch
+    _partial_: true
+  - _target_: src.utils.to_float
+    _partial_: true

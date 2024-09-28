@@ -1,0 +1,9 @@
+trace_len: 1400
+feature_size: ${trace_transforms.output_size}
+batch_size: 2048
+dataset:
+  _target_: src.datasets.ASCADv.Dataset
+  dataset_path: ${dataset_path}
+  trace_transforms: ${trace_transforms.transforms}
+  label_transforms: ${label_transforms.transforms}
+  profiling: true

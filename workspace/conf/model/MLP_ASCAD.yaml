@@ -1,0 +1,34 @@
+name: MLP
+model:
+  _target_: src.dnn.from_yaml
+  layers:
+    - _target_: torch.nn.LazyLinear
+      out_features: 200
+    - _target_: torch.nn.Tanh
+    - _target_: torch.nn.LazyLinear
+      out_features: 200
+    - _target_: torch.nn.Tanh
+    - _target_: torch.nn.LazyLinear
+      out_features: 200
+    - _target_: torch.nn.Tanh
+    - _target_: torch.nn.LazyLinear
+      out_features: 200
+    - _target_: torch.nn.Tanh
+    - _target_: torch.nn.LazyLinear
+      out_features: 200
+    - _target_: torch.nn.Tanh
+    - _target_: torch.nn.LazyLinear
+      out_features: 200
+    - _target_: torch.nn.Tanh
+    - _target_: torch.nn.LazyLinear
+      out_features: ${label_transforms.n_classes}
+
+train_params:
+  opt:
+    _target_: torch.optim.RMSprop
+    _partial_: true
+    lr: 1e-5
+  steps: 20000
+  device: ${device}
+  batch: 256
+  loss_fn: ${label_transforms.loss_fn}
